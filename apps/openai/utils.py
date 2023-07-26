@@ -7,18 +7,22 @@
 import json
 import os
 from typing import Dict, Any, Union, AsyncIterable
+# AsyncIterable 是异步编程中的重要概念。它们允许您从异步来源获取值，而无需等待所有值都准备好。
 
 from httpx import AsyncClient
+# httpx 异步客户端
 
 
-async def stream_request(url: str, params: Union[str, Dict[str, Any]]) -> AsyncIterable[Dict[str, Any]]:
+async def stream_request(url: str, params: Union[str, Dict[str, Any]]) \
+                            -> AsyncIterable[Dict[str, Any]]:
     """流请求"""
     async with AsyncClient() as client:
         headers = {
             "Content-Type": "application/json",
             "Authorization": "Bearer " + os.getenv("API_KEY"),
         }
-        async with client.stream("POST", url, headers=headers, json=params, timeout=60) as response:
+        async with client.stream("POST", url, headers=headers, \
+                            json=params, timeout=60) as response:
             async for line in response.aiter_lines():
                 if not line.strip():
                     continue
@@ -32,7 +36,8 @@ async def stream_request(url: str, params: Union[str, Dict[str, Any]]) -> AsyncI
                 yield data.get("choices")[0].get("delta")
 
 
-async def request(url: str, params: Union[str, Dict[str, Any]]) -> Dict[str, Any]:
+async def request(url: str, params: Union[str, Dict[str, Any]])\
+                    -> Dict[str, Any]:
     """请求"""
     async with AsyncClient() as client:
         headers = {
